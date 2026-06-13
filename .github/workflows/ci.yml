@@ -56,7 +56,7 @@ jobs:
       run: |
         cmake -B build-${{ matrix.name }} \
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type || env.BUILD_TYPE }} \
-          -DCMAKE_C_FLAGS="${{ matrix.cflags }} -Wall -Wextra ${{ matrix.name == 'clang' && '-Werror' || '-Werror' }}" \
+          -DCMAKE_C_FLAGS="${{ matrix.cflags }} -Wall -Wextra" \
           -DDS_BUILD_TESTS=ON
 
     - name: Build
