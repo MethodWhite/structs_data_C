@@ -1,221 +1,60 @@
-cmake_minimum_required(VERSION 3.28)
-project(structs_data_C C)
+cmake_minimum_required(VERSION 3.14)
+project(ds_data_structures VERSION 1.0.0 LANGUAGES C)
 
-set(CMAKE_C_STANDARD 23)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
-# Permitir establecer modo Debug o Release
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
+
+enable_testing()
+
+option(DS_BUILD_TESTS "Build tests" ON)
+
+add_library(ds_data_structures
+    src/ds_array_list.c
+    src/ds_hash_table.c
+    src/ds_tensor.c
+    src/ds_matrix.c
+    src/ds_heap.c
+    src/ds_ring_buffer.c
+)
+
+target_include_directories(ds_data_structures PUBLIC include)
+
+if(DS_BUILD_TESTS)
+    add_executable(ds_test_array_list
+        examples/test_array_list.c
+    )
+    target_link_libraries(ds_test_array_list PRIVATE ds_data_structures)
+    add_test(NAME ds_test_array_list COMMAND ds_test_array_list)
+
+    add_executable(ds_test_hash_table
+        examples/test_hash_table.c
+    )
+    target_link_libraries(ds_test_hash_table PRIVATE ds_data_structures)
+    add_test(NAME ds_test_hash_table COMMAND ds_test_hash_table)
+
+    add_executable(ds_test_tensor
+        examples/test_tensor.c
+    )
+    target_link_libraries(ds_test_tensor PRIVATE ds_data_structures)
+    add_test(NAME ds_test_tensor COMMAND ds_test_tensor)
+
+    add_executable(ds_test_matrix
+        examples/test_matrix.c
+    )
+    target_link_libraries(ds_test_matrix PRIVATE ds_data_structures)
+    add_test(NAME ds_test_matrix COMMAND ds_test_matrix)
+
+    add_executable(ds_test_heap
+        examples/test_heap.c
+    )
+    target_link_libraries(ds_test_heap PRIVATE ds_data_structures)
+    add_test(NAME ds_test_heap COMMAND ds_test_heap)
+
+    add_executable(ds_test_ring_buffer
+        examples/test_ring_buffer.c
+    )
+    target_link_libraries(ds_test_ring_buffer PRIVATE ds_data_structures)
+    add_test(NAME ds_test_ring_buffer COMMAND ds_test_ring_buffer)
 endif()
-
-# Configuraciones específicas por tipo de compilación
-set(CMAKE_C_FLAGS_DEBUG "-ggdb  -DDEBUG_ENABLE -O0 -Wall -Wpedantic -D_ExceptionHandler")
-set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG -D_ExceptionHandler")
-
-include_directories(.)
-include_directories(CIterators)
-include_directories(CIterators/examples)
-include_directories(CIterators/include)
-include_directories(CIterators/src)
-include_directories(DebugLibC)
-include_directories(DebugLibC/colors-C-C-plus-plus)
-include_directories(src)
-
-# examples/code_array-list_vector-list.c
-
-add_executable(code_array-list_vector-list
-        CIterators/include/CIterators.h
-        CIterators/include/CSortting.h
-        CIterators/src/CIterators.c
-        CIterators/src/CSortting.c
-        DebugLibC/colors-C-C-plus-plus/src/colors.c
-        DebugLibC/colors-C-C-plus-plus/colors.h
-        DebugLibC/src/debug_c.c
-        DebugLibC/src/error_c.c
-        DebugLibC/src/time_code.c
-        DebugLibC/debug_c.h
-        DebugLibC/error_c.h
-        DebugLibC/time_code.h
-        src/array-list.c
-        src/ast.c
-        src/hash-table.c
-        src/matriz-list.c
-        src/vector-list.c
-        array-list.h
-        ast.h
-        hash-table.h
-        matriz-list.h
-        vector-list.h
-        examples/code_array-list_vector-list.c)
-target_link_libraries(code_array-list_vector-list m)
-
-
-# examples/code_ast.c
-
-add_executable(code_ast
-        CIterators/include/CIterators.h
-        CIterators/include/CSortting.h
-        CIterators/src/CIterators.c
-        CIterators/src/CSortting.c
-        DebugLibC/colors-C-C-plus-plus/src/colors.c
-        DebugLibC/colors-C-C-plus-plus/colors.h
-        DebugLibC/src/debug_c.c
-        DebugLibC/src/error_c.c
-        DebugLibC/src/time_code.c
-        DebugLibC/debug_c.h
-        DebugLibC/error_c.h
-        DebugLibC/time_code.h
-        src/array-list.c
-        src/ast.c
-        src/hash-table.c
-        src/matriz-list.c
-        src/vector-list.c
-        array-list.h
-        ast.h
-        hash-table.h
-        matriz-list.h
-        vector-list.h
-        examples/code_ast.c)
-target_link_libraries(code_ast m)
-
-# examples/code_hash-table.c
-
-add_executable(code_hash-table
-        CIterators/include/CIterators.h
-        CIterators/include/CSortting.h
-        CIterators/src/CIterators.c
-        CIterators/src/CSortting.c
-        DebugLibC/colors-C-C-plus-plus/src/colors.c
-        DebugLibC/colors-C-C-plus-plus/colors.h
-        DebugLibC/src/debug_c.c
-        DebugLibC/src/error_c.c
-        DebugLibC/src/time_code.c
-        DebugLibC/debug_c.h
-        DebugLibC/error_c.h
-        DebugLibC/time_code.h
-        src/array-list.c
-        src/ast.c
-        src/hash-table.c
-        src/matriz-list.c
-        src/vector-list.c
-        array-list.h
-        ast.h
-        hash-table.h
-        matriz-list.h
-        vector-list.h
-        examples/code_hash-table.c)
-target_link_libraries(code_hash-table m)
-
-# examples/code_matriz-list.c
-
-add_executable(code_matriz-list
-        CIterators/include/CIterators.h
-        CIterators/include/CSortting.h
-        CIterators/src/CIterators.c
-        CIterators/src/CSortting.c
-        DebugLibC/colors-C-C-plus-plus/src/colors.c
-        DebugLibC/colors-C-C-plus-plus/colors.h
-        DebugLibC/src/debug_c.c
-        DebugLibC/src/error_c.c
-        DebugLibC/src/time_code.c
-        DebugLibC/debug_c.h
-        DebugLibC/error_c.h
-        DebugLibC/time_code.h
-        src/array-list.c
-        src/ast.c
-        src/hash-table.c
-        src/matriz-list.c
-        src/vector-list.c
-        array-list.h
-        ast.h
-        hash-table.h
-        matriz-list.h
-        vector-list.h
-        examples/code_matriz-list.c)
-target_link_libraries(code_matriz-list m)
-
-# examples/code_vector-list.c
-add_executable(code_vector-list
-        CIterators/include/CIterators.h
-        CIterators/include/CSortting.h
-        CIterators/src/CIterators.c
-        CIterators/src/CSortting.c
-        DebugLibC/colors-C-C-plus-plus/src/colors.c
-        DebugLibC/colors-C-C-plus-plus/colors.h
-        DebugLibC/src/debug_c.c
-        DebugLibC/src/error_c.c
-        DebugLibC/src/time_code.c
-        DebugLibC/debug_c.h
-        DebugLibC/error_c.h
-        DebugLibC/time_code.h
-        src/array-list.c
-        src/ast.c
-        src/hash-table.c
-        src/matriz-list.c
-        src/vector-list.c
-        array-list.h
-        ast.h
-        hash-table.h
-        matriz-list.h
-        vector-list.h
-        examples/code_vector-list.c)
-target_link_libraries(code_vector-list m)
-
-# examples/code_array-list.c
-add_executable(code_array-list
-        CIterators/include/CIterators.h
-        CIterators/include/CSortting.h
-        CIterators/src/CIterators.c
-        CIterators/src/CSortting.c
-        DebugLibC/colors-C-C-plus-plus/src/colors.c
-        DebugLibC/colors-C-C-plus-plus/colors.h
-        DebugLibC/src/debug_c.c
-        DebugLibC/src/error_c.c
-        DebugLibC/src/time_code.c
-        DebugLibC/debug_c.h
-        DebugLibC/error_c.h
-        DebugLibC/time_code.h
-        src/array-list.c
-        src/ast.c
-        src/hash-table.c
-        src/matriz-list.c
-        src/vector-list.c
-        array-list.h
-        ast.h
-        hash-table.h
-        matriz-list.h
-        vector-list.h
-        examples/code_array-list.c)
-target_link_libraries(code_array-list m)
-
-# Configuraciones específicas por tipo de compilación
-set(CMAKE_C_FLAGS_DEBUG "-g -O0 -Wall -Wpedantic -D_ExceptionHandler")
-set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG -D_ExceptionHandler")
-# examples/code_array-list.c
-add_executable(code_hash-table-dynamic
-        CIterators/include/CIterators.h
-        CIterators/include/CSortting.h
-        CIterators/src/CIterators.c
-        CIterators/src/CSortting.c
-        DebugLibC/colors-C-C-plus-plus/src/colors.c
-        DebugLibC/colors-C-C-plus-plus/colors.h
-        DebugLibC/src/debug_c.c
-        DebugLibC/src/error_c.c
-        DebugLibC/src/time_code.c
-        DebugLibC/debug_c.h
-        DebugLibC/error_c.h
-        DebugLibC/time_code.h
-        src/array-list.c
-        src/ast.c
-        src/hash-table.c
-        src/matriz-list.c
-        src/vector-list.c
-        src/hash-table-dynamic.c
-        array-list.h
-        ast.h
-        hash-table.h
-        matriz-list.h
-        vector-list.h
-        hash-table-dynamic.h
-        examples/code_hash-table-dynamic.c)
-target_link_libraries(code_hash-table-dynamic m)

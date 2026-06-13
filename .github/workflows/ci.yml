@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - name: gcc
+            compiler: gcc
+            cflags: ""
+          - name: clang
+            compiler: clang
+            cflags: ""
+          - name: asan
+            compiler: clang
+            cflags: "-fsanitize=address -fno-omit-frame-pointer -fno-optimize-sibling-calls"
+            build_type: Debug
+          - name: coverage
+            compiler: gcc
+            cflags: "--coverage -g -O0"
+            build_type: Debug
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake build-essential gcc clang cppcheck lcov gcovr
+
+    - name: Cache build
+      uses: actions/cache@v4
+      with:
+        path: build-${{ matrix.name }}
+        key: ${{ matrix.name }}-build-${{ hashFiles('CMakeLists.txt', 'src/*.c', 'include/*.h', 'examples/*.c') }}
+        restore-keys: |
+          ${{ matrix.name }}-build-
+
+    - name: Configure CMake
+      env:
+        CC: ${{ matrix.compiler }}
+        CFLAGS: ${{ matrix.cflags }}
+        CXX: ${{ matrix.compiler }}
+      run: |
+        cmake -B build-${{ matrix.name }} \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type || env.BUILD_TYPE }} \
+          -DCMAKE_C_FLAGS="${{ matrix.cflags }} -Wall -Wextra ${{ matrix.name == 'clang' && '-Werror' || '-Werror' }}" \
+          -DDS_BUILD_TESTS=ON
+
+    - name: Build
+      run: cmake --build build-${{ matrix.name }} --config ${{ matrix.build_type || env.BUILD_TYPE }} --parallel
+
+    - name: Run tests
+      working-directory: build-${{ matrix.name }}
+      run: ctest --output-on-failure -C ${{ matrix.build_type || env.BUILD_TYPE }} --parallel
+
+    - name: Generate coverage report
+      if: matrix.name == 'coverage'
+      run: |
+        gcovr build-coverage --root . --xml coverage.xml --html coverage.html
+        echo "Coverage report generated"
+
+    - name: Upload coverage artifact
+      if: matrix.name == 'coverage'
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage.*
+
+    - name: Static analysis (cppcheck)
+      if: matrix.name == 'gcc'
+      run: |
+        cppcheck --enable=all --suppress=missingIncludeSystem \
+          --error-exitcode=1 \
+          --std=c11 \
+          --language=c \
+          src/ include/

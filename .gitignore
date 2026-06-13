@@ -1,14 +1,33 @@
-*.exe
-*.elf
-*.json
-*.i
-*.s
+# Build artifacts
+build/
 *.o
-.vscode
-*.json
-*.out
-*grpof*
-gmon.*
-error_log.txt
-
+*.exe
+*.dll
+*.so
 *.a
+*.lib
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile.cmake
+CTestTestfile.cmake
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Debug
+*.log
+*.tmp
+
+# Archive (optional - uncomment if you don't want to track legacy code)
+# _archive/
